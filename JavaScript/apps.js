@@ -12,3 +12,15 @@ function openApp(id) {
         };
     });
 }
+function fakeTerminal() {
+    return `Cat Linux Terminal
+-----------------
+$ uname -a
+CatLinux 32-bit Kernel
+
+$ ls
+home  bin  etc  usr  var
+
+$ echo Ready
+Ready`;
+}
