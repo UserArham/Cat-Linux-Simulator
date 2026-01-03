@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cat Linux</title>
+<style>
+/* ======================
+   Reset & Base
+   ====================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; color: #00ffcc; font-family: "Courier New", monospace; }
+input { background: #000; color: #00ffcc; border: none; outline: none; width: 100%; font-family: inherit; }
+.hidden { display: none; }
+
+/* ======================
+   Terminal
+   ====================== */
+#terminal { padding: 20px; }
+
+/* ======================
+   Boot & Setup
+   ====================== */
+#boot, #setup { padding: 20px; white-space: pre-wrap; }
+
+/* ======================
+   Desktop & Taskbar
+   ====================== */
+#desktop { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px; }
+.app { border: 2px solid #00ffcc; padding: 10px; text-align: center; cursor: pointer; }
+.app:hover { background: #00ffcc; color: #000; }
+#taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 32px; background: #000; border-top: 2px solid #00ffcc; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; font-size: 14px; }
+
+/* ======================
+   Window
+   ====================== */
+#window { position: fixed; top: 20%; left: 30%; width: 40%; background: #000; border: 3px solid #00ffcc; padding: 10px; }
+#windowHeader { display: flex; justify-content: space-between; }
+#windowHeader span { cursor: pointer; }
+#windowContent { margin-top: 10px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ======================
+// Global App Container
+// ======================
+const app = document.getElementById("app");
+
+// ======================
+// Load Terminal
+// ======================
+function loadTerminal() {
+    app.innerHTML = `
+<div id="terminal">
+<p>Cat Linux Console</p>
+<p>Type <strong>Start</strong> to boot the system.</p>
+<input id="commandInput" autofocus>
+</div>
+`;
+    document.getElementById("commandInput")
+    .addEventListener("keydown", e => {
+        if(e.key === "Enter" && e.target.value.trim().toLowerCase() === "start") {
+            loadBoot();
+        }
+    });
+}
+
+// ======================
+// Boot Sequence
+// ======================
+function loadBoot() {
+    app.innerHTML = `
+<div id="boot">
+Cat Linux 32-bit
+----------------
+Initializing kernel
+Loading drivers
+Mounting filesystem
+</div>
+`;
+    const firstBoot = !localStorage.getItem("catlinux_installed");
+    setTimeout(() => {
+        if(firstBoot) {
+            localStorage.setItem("catlinux_installed","true");
+            loadSetup();
+        } else {
+            loadDesktop();
+        }
+    }, 2500);
+}
+
+// ======================
+// Setup Sequence
+// ======================
+function loadSetup() {
+    app.innerHTML = `
+<div id="setup">
+Cat Linux Initial Setup
+Configuring system...
+</div>
+`;
+    setTimeout(loadDesktop,2000);
+}
+
+// ======================
+// Desktop
+// ======================
+function loadDesktop() {
+    app.innerHTML = `
+<div id="desktop"></div>
+<div id="taskbar">
+    <span>Cat Linux</span>
+    <span id="clock"></span>
+</div>
+`;
+    initDesktop();
+    startClock();
+}
+
+// ======================
+// Desktop Apps
+// ======================
+function initDesktop() {
+    const desktop = document.getElementById("desktop");
+    for(let i=1;i<=25;i++){
+        const icon = document.createElement("div");
+        icon.className = "app";
+        icon.textContent = i===1?"File Manager": i===2?"Terminal":"App "+i;
+        icon.onclick = () => openApp(i);
+        desktop.appendChild(icon);
+    }
+}
+
+// ======================
+// Clock
+// ======================
+function startClock(){
+    const clock = document.getElementById("clock");
+    setInterval(()=>{
+        const now = new Date();
+        clock.textContent = now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+    },1000);
+}
+
+// ======================
+// Open App
+// ======================
+function openApp(id){
+    const windowDiv = document.createElement("div");
+    windowDiv.id = "window";
+    windowDiv.innerHTML = `
+<div id="windowHeader">
+<span>${id===1?"File Manager": id===2?"Terminal":"App "+id}</span>
+<span id="close">X</span>
+</div>
+<pre id="windowContent"></pre>
+`;
+    document.body.appendChild(windowDiv);
+
+    const content = windowDiv.querySelector("#windowContent");
+    if(id===1){
+        content.textContent =
+`Cat Linux File Manager
+
+/
+├── home
+├── bin
+├── etc
+├── usr
+└── var`;
+    } else if(id===2){
+        content.textContent =
+`Cat Linux Terminal
+-----------------
+$ uname -a
+CatLinux 32-bit Kernel
+
+$ ls
+home  bin  etc  usr  var
+
+$ echo Ready
+Ready`;
+    } else {
+        content.textContent =
+`Cat Linux Application ${id}
+Status: Running
+Mode: 32-bit`;
+    }
+
+    windowDiv.querySelector("#close").onclick = () => windowDiv.remove();
+}
+
+// ======================
+// Start
+// ======================
+loadTerminal();
+</script>
+
+</body>
+</html>
