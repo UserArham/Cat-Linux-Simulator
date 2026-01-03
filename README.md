@@ -1,5 +1,5 @@
 # Cat Linux Simulator by an MIT License
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/HazAT/badge/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/UserArham/Cat-Linux-Simulator/blob/main/LICENSE)
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
 ![Svelte](https://img.shields.io/badge/Svelte-FF3E00?style=flat&logo=svelte&logoColor=white)
 ![SAAS](https://img.shields.io/badge/Sass-CC6699?style=flat&logo=sass&logoColor=white)
@@ -61,4 +61,4 @@ In a later phase, all assets will be combined into a single `index.html`.
 - Visual design is inspired by classic 32-bit systems
 
 ## License
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/HazAT/badge/blob/master/LICENSE)
+[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/UserArham/Cat-Linux-Simulator/blob/main/LICENSE)
