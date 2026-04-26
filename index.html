@@ -98,12 +98,15 @@ function openApp(id){
     windowDiv.innerHTML = `
 <div id="windowHeader">
 <span>${appList[id-1].name}</span>
-<span id="close">X</span>
+<span class="close">X</span>
 </div>
 <div id="windowContent"></div>
 `;
     document.body.appendChild(windowDiv);
     const content = windowDiv.querySelector("#windowContent");
+
+    const closeBtn = windowDiv.querySelector(".close");
+    closeBtn.onclick = () => windowDiv.remove();
 
     switch(id){
         case 1: // File Manager
@@ -177,8 +180,6 @@ Ready`;
             content.appendChild(clockDisplay);
             break;
     }
-
-    windowDiv.querySelector("#close").onclick = ()=>windowDiv.remove();
 }
 
 loadTerminal();
