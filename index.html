@@ -16,7 +16,7 @@ input { background: #000; color: #00ffcc; border: none; outline: none; width: 10
 #window { position: fixed; top: 10%; left: 20%; width: 60%; background: #000; border: 3px solid #00ffcc; padding: 10px; z-index: 1000; }
 #windowHeader { display: flex; justify-content: space-between; }
 #windowHeader span { cursor: pointer; }
-#windowContent { margin-top: 10px; white-space: pre-wrap; }
+#windowContent { margin-top: 10px; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
 canvas { background: #000; border: 1px solid #00ffcc; display: block; margin: 10px 0; }
 .color-btn { width: 20px; height: 20px; display: inline-block; margin: 2px; cursor: pointer; border: 1px solid #00ffcc; }
 </style>
@@ -119,15 +119,33 @@ function openApp(id){
 ├── usr
 └── var`;
             break;
-        case 2: // Terminal
-            content.textContent =
-`Cat Linux Terminal
------------------
-$ uname -a
-CatLinux 32-bit Kernel
+        case 2: // Terminal (JavaScript console)
+            const termInput = document.createElement("input");
+            termInput.style.width = "100%";
+            termInput.style.background = "#000";
+            termInput.style.color = "#00ffcc";
+            termInput.style.border = "none";
+            termInput.style.fontFamily = "'VT323', monospace";
+            termInput.placeholder = "Type JS code and press Enter";
+            const outputDiv = document.createElement("div");
+            outputDiv.style.whiteSpace = "pre-wrap";
+            outputDiv.style.marginTop = "5px";
+            content.appendChild(outputDiv);
+            content.appendChild(termInput);
 
-$ echo Ready
-Ready`;
+            termInput.addEventListener("keydown", e => {
+                if (e.key === "Enter") {
+                    let result;
+                    try {
+                        result = eval(e.target.value);
+                    } catch (err) {
+                        result = "Error: " + err.message;
+                    }
+                    outputDiv.textContent += "> " + e.target.value + "\n" + result + "\n";
+                    e.target.value = "";
+                    outputDiv.scrollTop = outputDiv.scrollHeight;
+                }
+            });
             break;
         case 3: // Windows Environment
             window.open("https://windows-7-simulator.vercel.app/", "_blank");
