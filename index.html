@@ -3,140 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <title>Cat Linux</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <style>
-/* ======================
-   Reset & Base
-   ====================== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #000; color: #00ffcc; font-family: "Courier New", monospace; }
+body { background: #000; color: #00ffcc; font-family: 'VT323', monospace; }
 input { background: #000; color: #00ffcc; border: none; outline: none; width: 100%; font-family: inherit; }
 .hidden { display: none; }
-
-/* ======================
-   Terminal
-   ====================== */
-#terminal { padding: 20px; }
-
-/* ======================
-   Boot & Setup
-   ====================== */
-#boot, #setup { padding: 20px; white-space: pre-wrap; }
-
-/* ======================
-   Desktop & Taskbar
-   ====================== */
-#desktop { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px; }
+#desktop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px; }
 .app { border: 2px solid #00ffcc; padding: 10px; text-align: center; cursor: pointer; }
 .app:hover { background: #00ffcc; color: #000; }
 #taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 32px; background: #000; border-top: 2px solid #00ffcc; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; font-size: 14px; }
-
-/* ======================
-   Window
-   ====================== */
-#window { position: fixed; top: 20%; left: 30%; width: 40%; background: #000; border: 3px solid #00ffcc; padding: 10px; }
+#window { position: fixed; top: 10%; left: 20%; width: 60%; background: #000; border: 3px solid #00ffcc; padding: 10px; z-index: 1000; }
 #windowHeader { display: flex; justify-content: space-between; }
 #windowHeader span { cursor: pointer; }
 #windowContent { margin-top: 10px; white-space: pre-wrap; }
+canvas { background: #000; border: 1px solid #00ffcc; display: block; margin: 10px 0; }
+.color-btn { width: 20px; height: 20px; display: inline-block; margin: 2px; cursor: pointer; border: 1px solid #00ffcc; }
 </style>
 </head>
 <body>
-
 <div id="app"></div>
-
 <script>
-// ======================
-// Global App Container
-// ======================
 const app = document.getElementById("app");
 
-// ======================
-// Load Terminal
-// ======================
+// Terminal / Boot
 function loadTerminal() {
     app.innerHTML = `
 <div id="terminal">
 <p>Cat Linux Console</p>
 <p>Type <strong>Start</strong> to boot the system.</p>
 <input id="commandInput" autofocus>
-</div>
-`;
+</div>`;
     document.getElementById("commandInput")
     .addEventListener("keydown", e => {
-        if(e.key === "Enter" && e.target.value.trim().toLowerCase() === "start") {
-            loadBoot();
-        }
+        if(e.key === "Enter" && e.target.value.trim().toLowerCase() === "start") loadBoot();
     });
 }
 
-// ======================
-// Boot Sequence
-// ======================
 function loadBoot() {
-    app.innerHTML = `
-<div id="boot">
+    app.innerHTML = `<div id="boot">
 Cat Linux 32-bit
 ----------------
 Initializing kernel
 Loading drivers
 Mounting filesystem
-</div>
-`;
-    const firstBoot = !localStorage.getItem("catlinux_installed");
-    setTimeout(() => {
-        if(firstBoot) {
-            localStorage.setItem("catlinux_installed","true");
-            loadSetup();
-        } else {
-            loadDesktop();
-        }
-    }, 2500);
+</div>`;
+    setTimeout(loadDesktop, 2000);
 }
 
-// ======================
-// Setup Sequence
-// ======================
-function loadSetup() {
-    app.innerHTML = `
-<div id="setup">
-Cat Linux Initial Setup
-Configuring system...
-</div>
-`;
-    setTimeout(loadDesktop,2000);
-}
-
-// ======================
 // Desktop
-// ======================
 function loadDesktop() {
     app.innerHTML = `
 <div id="desktop"></div>
 <div id="taskbar">
     <span>Cat Linux</span>
     <span id="clock"></span>
-</div>
-`;
+</div>`;
     initDesktop();
     startClock();
 }
 
-// ======================
-// Desktop Apps
-// ======================
+const appList = [
+    {name:"File Manager"},
+    {name:"Terminal"},
+    {name:"Windows Environment"},
+    {name:"Camera"},
+    {name:"Browser"},
+    {name:"Paint"},
+    {name:"Clock"}
+];
+
 function initDesktop() {
     const desktop = document.getElementById("desktop");
-    for(let i=1;i<=25;i++){
+    appList.forEach((a,i)=>{
         const icon = document.createElement("div");
         icon.className = "app";
-        icon.textContent = i===1?"File Manager": i===2?"Terminal":"App "+i;
-        icon.onclick = () => openApp(i);
+        icon.textContent = a.name;
+        icon.onclick = () => openApp(i+1);
         desktop.appendChild(icon);
-    }
+    });
 }
 
-// ======================
-// Clock
-// ======================
 function startClock(){
     const clock = document.getElementById("clock");
     setInterval(()=>{
@@ -145,59 +92,96 @@ function startClock(){
     },1000);
 }
 
-// ======================
-// Open App
-// ======================
 function openApp(id){
     const windowDiv = document.createElement("div");
     windowDiv.id = "window";
     windowDiv.innerHTML = `
 <div id="windowHeader">
-<span>${id===1?"File Manager": id===2?"Terminal":"App "+id}</span>
+<span>${appList[id-1].name}</span>
 <span id="close">X</span>
 </div>
-<pre id="windowContent"></pre>
+<div id="windowContent"></div>
 `;
     document.body.appendChild(windowDiv);
-
     const content = windowDiv.querySelector("#windowContent");
-    if(id===1){
-        content.textContent =
-`Cat Linux File Manager
 
+    switch(id){
+        case 1: // File Manager
+            content.textContent =
+`Cat Linux File Manager
 /
 ├── home
 ├── bin
 ├── etc
 ├── usr
 └── var`;
-    } else if(id===2){
-        content.textContent =
+            break;
+        case 2: // Terminal
+            content.textContent =
 `Cat Linux Terminal
 -----------------
 $ uname -a
 CatLinux 32-bit Kernel
 
-$ ls
-home  bin  etc  usr  var
-
 $ echo Ready
 Ready`;
-    } else {
-        content.textContent =
-`Cat Linux Application ${id}
-Status: Running
-Mode: 32-bit`;
+            break;
+        case 3: // Windows Environment
+            window.open("https://windows-7-simulator.vercel.app/", "_blank");
+            content.textContent = "Opening Windows Environment...";
+            break;
+        case 4: // Camera
+            const video = document.createElement("video");
+            video.autoplay = true;
+            video.width = 400;
+            content.appendChild(video);
+            navigator.mediaDevices.getUserMedia({video:true}).then(stream=>video.srcObject=stream)
+            .catch(()=>content.textContent="Camera access denied.");
+            break;
+        case 5: // Browser
+            const iframe = document.createElement("iframe");
+            iframe.src = "https://wiby.me/";
+            iframe.width = "100%";
+            iframe.height = "400px";
+            content.appendChild(iframe);
+            break;
+        case 6: // Paint
+            const colors = ["#00ffcc","#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff","#ffffff","#888888","#ff8800"];
+            let currentColor = colors[0];
+            const colorDiv = document.createElement("div");
+            colors.forEach(c=>{
+                const btn = document.createElement("div");
+                btn.className="color-btn";
+                btn.style.backgroundColor=c;
+                btn.onclick=()=>currentColor=c;
+                colorDiv.appendChild(btn);
+            });
+            const canvas = document.createElement("canvas");
+            canvas.width=400; canvas.height=300;
+            const ctx = canvas.getContext("2d");
+            let painting=false;
+            canvas.onmousedown=()=>painting=true;
+            canvas.onmouseup=()=>painting=false;
+            canvas.onmousemove=(e)=>{
+                if(!painting) return;
+                ctx.fillStyle=currentColor;
+                ctx.fillRect(e.offsetX,e.offsetY,4,4);
+            };
+            content.appendChild(colorDiv);
+            content.appendChild(canvas);
+            break;
+        case 7: // Clock
+            const clockDisplay = document.createElement("div");
+            clockDisplay.style.fontSize="24px";
+            setInterval(()=>clockDisplay.textContent=new Date().toLocaleTimeString(),1000);
+            content.appendChild(clockDisplay);
+            break;
     }
 
-    windowDiv.querySelector("#close").onclick = () => windowDiv.remove();
+    windowDiv.querySelector("#close").onclick = ()=>windowDiv.remove();
 }
 
-// ======================
-// Start
-// ======================
 loadTerminal();
 </script>
-
 </body>
 </html>
